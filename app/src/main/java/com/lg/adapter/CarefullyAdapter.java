@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
 import com.lg.fragment.CarefullyFragment;
+import com.lg.happysmile.MainActivity;
 import com.lg.happysmile.R;
 import com.lg.holder.CarefullyHolder;
 
@@ -41,12 +43,14 @@ public class CarefullyAdapter extends RecyclerView.Adapter<CarefullyHolder> {
     @Override
     public void onBindViewHolder(CarefullyHolder holder, int position) {
         holder.getCarefully_tv().setText(CarefullyFragment.strings.get(position));
-        //当item为最后一个的时候，加载分页
-        if (position == getItemCount() - 1) {
-            CarefullyFragment.num++;
-            carefullyholder = holder;
-            holder.getCarefully_pro().setVisibility(View.VISIBLE);
-            new CarefullyFragment.CarefullyAsyncTask().execute();
+        if (MainActivity.isOk) {
+            //当item为最后一个的时候，加载分页
+            if (position == getItemCount() - 1) {
+                CarefullyFragment.num++;
+                carefullyholder = holder;
+                holder.getCarefully_pro().setVisibility(View.VISIBLE);
+                new CarefullyFragment.CarefullyAsyncTask().execute();
+            }
         }
         //设置加载item动画
         setAnimation(holder.getCarefully_line(), position);

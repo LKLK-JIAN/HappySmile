@@ -120,7 +120,8 @@ public class ImageFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             Image image = new Image();
             image.setImg_title(img.get("title").toString());
             String strUrl = img.get("img").toString();
-            strUrl = strUrl.replaceAll("/></p>", "");
+            strUrl = strUrl.replaceAll("</p>", "");
+            strUrl = strUrl.replaceAll("/>", "");
             strUrl = strUrl.replaceAll("\"", "");
             image.setImg_url(strUrl);
             images.add(image);

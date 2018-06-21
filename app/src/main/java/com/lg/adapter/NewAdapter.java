@@ -60,20 +60,32 @@ public class NewAdapter extends RecyclerView.Adapter<NewHolder> {
     public void onBindViewHolder(final NewHolder holder, int position) {
         holder.getNew_title().setText(NewFragment.images.get(position).getImg_title());
         Uri uri = Uri.parse(NewFragment.images.get(position).getImg_url());
-        if (MainActivity.state) {
-            DraweeController draweeController = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
-            holder.getNews().setController(draweeController);
+        if (MainActivity.isOk) {
+            if (MainActivity.state) {
+                DraweeController draweeController = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+                holder.getNews().setController(draweeController);
 //        holder.getImg().setErrorImageResId(R.drawable.no_img);
 //        holder.getImg().setDefaultImageResId(R.drawable.no_img);
 //        holder.getImg().setImageUrl(NewFragment.images.get(position).getImg_url(), NewFragment.imageLoader);
-            //当item为最后一个的时候，加载分页
-            if (position == getItemCount() - 1) {
-                NewFragment.num++;
-                newHolder = holder;
-                holder.getNew_pro().setVisibility(View.VISIBLE);
-                new NewFragment.NewAsyncTask().execute();
+                //当item为最后一个的时候，加载分页
+                if (position == getItemCount() - 1) {
+                    NewFragment.num++;
+                    newHolder = holder;
+                    holder.getNew_pro().setVisibility(View.VISIBLE);
+                    new NewFragment.NewAsyncTask().execute();
+                }
+            } else {
+                CacheKey cacheKey = DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(ImageRequest.fromUri(uri));
+                File cacheFile = FrescoUtil.getCachedImageOnDisk(cacheKey);
+                if (cacheFile != null) {   //存在缓存
+                    DraweeController draweeController = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+                    holder.getNews().setController(draweeController);
+                } else {
+                    holder.getNews().setImageResource(R.drawable.error);
+                    holder.getNews().setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                }
             }
-        } else {
+        }else {
             CacheKey cacheKey = DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(ImageRequest.fromUri(uri));
             File cacheFile = FrescoUtil.getCachedImageOnDisk(cacheKey);
             if (cacheFile != null) {   //存在缓存
@@ -83,7 +95,6 @@ public class NewAdapter extends RecyclerView.Adapter<NewHolder> {
                 holder.getNews().setImageResource(R.drawable.error);
                 holder.getNews().setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             }
-
         }
 
         //设置加载item动画

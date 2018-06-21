@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +21,6 @@ import com.lg.happysmile.R;
 import com.lg.pojo.Image;
 import com.lg.service.HappyService;
 import com.lg.util.DividerLinearItemDecoration;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,6 @@ public class NewFragment extends Fragment implements SwipeRefreshLayout.OnRefres
     public static RecyclerView new_recycler;
     public static NewAdapter new_adapter;
     private View view;
-    //    public static ImageLoader imageLoader;
     public static int num;
     public static LinearLayout new_frg_line;
     private SwipeRefreshLayout new_srl;
@@ -42,7 +39,6 @@ public class NewFragment extends Fragment implements SwipeRefreshLayout.OnRefres
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_new, container, false);
         init();
-//        imageLoader = new ImageLoader(App.queues, new BitmapCache());
         NewAsyncTask imageAsyncTask = new NewAsyncTask();
         imageAsyncTask.execute();
         return view;

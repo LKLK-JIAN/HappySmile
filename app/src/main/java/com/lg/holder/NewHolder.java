@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.android.volley.toolbox.NetworkImageView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.lg.happysmile.R;
 

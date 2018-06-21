@@ -16,7 +16,6 @@ import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.lg.dao.OnItemClickLitener;
 import com.lg.fragment.ImageFragment;
-import com.lg.fragment.NewFragment;
 import com.lg.happysmile.MainActivity;
 import com.lg.happysmile.R;
 import com.lg.holder.ImageHolder;
@@ -61,15 +60,27 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageHolder> {
     public void onBindViewHolder(final ImageHolder holder, int position) {
         holder.getImg_title().setText(ImageFragment.images.get(position).getImg_title());
         Uri uri = Uri.parse(ImageFragment.images.get(position).getImg_url());
-        if (MainActivity.state) {
-            DraweeController draweeController = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
-            holder.getImg().setController(draweeController);
-            //当item为最后一个的时候，加载分页
-            if (position == getItemCount() - 1) {
-                ImageFragment.num++;
-                imgHolder = holder;
-                holder.getImg_pro().setVisibility(View.VISIBLE);
-                new ImageFragment.ImageAsyncTask().execute();
+        if (MainActivity.isOk) {
+            if (MainActivity.state) {
+                DraweeController draweeController = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+                holder.getImg().setController(draweeController);
+                //当item为最后一个的时候，加载分页
+                if (position == getItemCount() - 1) {
+                    ImageFragment.num++;
+                    imgHolder = holder;
+                    holder.getImg_pro().setVisibility(View.VISIBLE);
+                    new ImageFragment.ImageAsyncTask().execute();
+                }
+            } else {
+                CacheKey cacheKey = DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(ImageRequest.fromUri(uri));
+                File cacheFile = FrescoUtil.getCachedImageOnDisk(cacheKey);
+                if (cacheFile != null) {   //存在缓存
+                    DraweeController draweeController = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+                    holder.getImg().setController(draweeController);
+                } else {
+                    holder.getImg().setImageResource(R.drawable.error);
+                    holder.getImg().setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                }
             }
         } else {
             CacheKey cacheKey = DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(ImageRequest.fromUri(uri));

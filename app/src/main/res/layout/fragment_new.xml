@@ -14,6 +14,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/new_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
             <LinearLayout
                 android:id="@+id/new_error"
                 android:layout_width="match_parent"
@@ -28,10 +33,6 @@
                     android:src="@drawable/error" />
             </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/new_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
         </RelativeLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>

@@ -13,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private ConnectivityManager manager;
     //显示状态
     public static boolean state = true;
+    private long exitTime = 0;
+    //网络是否可用
+    public static boolean isOk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +52,48 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         registerReceiver(broadcastReceiver, intentFilter);
     }
 
+    private void init() {
+        sp = getSharedPreferences("Happy", MODE_PRIVATE);
+        editor = sp.edit();
+        tab_layout = (TabLayout) findViewById(R.id.tab_layout);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
+        fragments = new ArrayList<>();
+        //设置TabLayout标签的显示方式
+        tab_layout.setTabMode(TabLayout.MODE_FIXED);
+        //循环注入标签
+        for (String tab : titles) {
+            tab_layout.addTab(tab_layout.newTab().setText(tab));
+        }
+        //设置TabLayout点击事件
+        tab_layout.setOnTabSelectedListener(this);
+        fragments.add(new NewFragment());
+        fragments.add(new CarefullyFragment());
+        fragments.add(new ImageFragment());
+        fragments.add(new JokeFragment());
+        view_adapter = new MyViewPagerAdapter(getSupportFragmentManager(), titles, fragments);
+        viewPager.setAdapter(view_adapter);
+        tab_layout.setupWithViewPager(viewPager);
+    }
+
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //获取连接信息
-            manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetInfo = manager.
-                    getActiveNetworkInfo();
-            if (activeNetInfo != null) {
-                isNetworkAvailable();
-            }else {
-                Toast.makeText(MainActivity.this,"请检查网络连接！",Toast.LENGTH_SHORT).show();
+            try {
+                //获取连接信息
+                manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                // 获取NetworkInfo对象
+                NetworkInfo networkinfo = manager.getActiveNetworkInfo();
+
+                if (networkinfo != null || networkinfo.isAvailable()) {
+                    isOk=true;
+                    isNetworkAvailable();
+                    return;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            isOk = false;
         }
     };
 
@@ -89,34 +123,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (System.currentTimeMillis() - exitTime > 2000) {
+                Toast.makeText(MainActivity.this, "再点我就走喽！", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                return super.onKeyDown(keyCode, event);
+            }
+        }
+        return true;
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
     }
 
-    private void init() {
-        sp = getSharedPreferences("Happy", MODE_PRIVATE);
-        editor = sp.edit();
-        tab_layout = (TabLayout) findViewById(R.id.tab_layout);
-        viewPager = (ViewPager) findViewById(R.id.view_pager);
-        fragments = new ArrayList<>();
-        //设置TabLayout标签的显示方式
-        tab_layout.setTabMode(TabLayout.MODE_FIXED);
-        //循环注入标签
-        for (String tab : titles) {
-            tab_layout.addTab(tab_layout.newTab().setText(tab));
-        }
-        //设置TabLayout点击事件
-        tab_layout.setOnTabSelectedListener(this);
 
-        fragments.add(new NewFragment());
-        fragments.add(new CarefullyFragment());
-        fragments.add(new ImageFragment());
-        fragments.add(new JokeFragment());
-        view_adapter = new MyViewPagerAdapter(getSupportFragmentManager(), titles, fragments);
-        viewPager.setAdapter(view_adapter);
-        tab_layout.setupWithViewPager(viewPager);
-    }
 
     public void onClick(View view) {
         startActivity(new Intent(this, SettingActivity.class));
